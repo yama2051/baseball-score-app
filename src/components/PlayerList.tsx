@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import FieldError from './FieldError'
 
 type Player = {
   id: number
@@ -31,12 +32,30 @@ const EMPTY_FORM: NewPlayerForm = {
   throwHand: '右',
 }
 
+const STORAGE_KEY = 'baseball-score-app-players'
+
+const readSavedPlayers = (): Player[] => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (!saved) return INITIAL_PLAYERS
+
+    const parsed = JSON.parse(saved) as Player[]
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_PLAYERS
+  } catch {
+    return INITIAL_PLAYERS
+  }
+}
+
 function PlayerList() {
-  const [players, setPlayers] = useState<Player[]>(INITIAL_PLAYERS)
+  const [players, setPlayers] = useState<Player[]>(readSavedPlayers)
   const [search, setSearch] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
   const [form, setForm] = useState<NewPlayerForm>(EMPTY_FORM)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(players))
+  }, [players])
 
   const filtered = players.filter(player => {
     const keyword = search.trim().toLowerCase()
@@ -199,11 +218,7 @@ function PlayerList() {
             </div>
           </div>
 
-          {error && (
-            <div className="error-box" role="alert">
-              <p className="error">{error}</p>
-            </div>
-          )}
+          <FieldError message={error} />
 
           <div className="form-actions">
             <button type="button" className="btn-cancel" onClick={() => {

@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import PlayerList from './components/PlayerList'
 import GameForm from './components/GameForm'
 import GameResultList, { type GameResult } from './components/GameResultList'
 
 type RegisteredGame = GameResult
+
+const STORAGE_KEY = 'baseball-score-app-games'
 
 const initialGames: RegisteredGame[] = [
   {
@@ -29,9 +31,25 @@ const initialGames: RegisteredGame[] = [
   },
 ]
 
+const readSavedGames = (): RegisteredGame[] => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (!saved) return initialGames
+
+    const parsed = JSON.parse(saved) as RegisteredGame[]
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialGames
+  } catch {
+    return initialGames
+  }
+}
+
 function App() {
   const [showForm, setShowForm] = useState(false)
-  const [games, setGames] = useState<RegisteredGame[]>(initialGames)
+  const [games, setGames] = useState<RegisteredGame[]>(readSavedGames)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(games))
+  }, [games])
 
   const handleSubmit = (data: Omit<RegisteredGame, 'id'>) => {
     const newGame: RegisteredGame = {
