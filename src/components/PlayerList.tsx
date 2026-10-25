@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import DeletePlayerButton from './DeletePlayerButton'
+import EditPlayerForm from './EditPlayerForm'
 import FieldError from './FieldError'
 
 type Player = {
@@ -34,6 +36,33 @@ const EMPTY_FORM: NewPlayerForm = {
 
 const STORAGE_KEY = 'baseball-score-app-players'
 
+const POSITION_ALIASES: Record<string, string[]> = {
+  SS: ['SS', 'shortstop', 'ショート', 'ショートストップ', '遊撃', '遊撃手'],
+  '1B': ['1B', 'first base', 'firstbase', 'ファースト', '一塁', '一塁手'],
+  '2B': ['2B', 'second base', 'secondbase', 'セカンド', '二塁', '二塁手'],
+  '3B': ['3B', 'third base', 'thirdbase', 'サード', '三塁', '三塁手'],
+  C: ['C', 'catcher', 'キャッチャー', '捕手'],
+  CF: ['CF', 'center field', 'centerfield', 'センター', '中堅', '中堅手'],
+  LF: ['LF', 'left field', 'leftfield', 'レフト', '左翼', '左翼手'],
+  RF: ['RF', 'right field', 'rightfield', 'ライト', '右翼', '右翼手'],
+  P: ['P', 'pitcher', 'ピッチャー', '投手'],
+}
+
+const normalizeSearchText = (value: string): string[] => {
+  const compact = value.normalize('NFKC').replace(/\s+/g, '').toLowerCase()
+  const hiragana = compact.replace(/[ァ-ヶ]/g, char => String.fromCharCode(char.charCodeAt(0) - 0x60))
+  const katakana = hiragana.replace(/[ぁ-ゖ]/g, char => String.fromCharCode(char.charCodeAt(0) + 0x60))
+
+  return Array.from(new Set([compact, hiragana, katakana]))
+}
+
+const matchesSearchTerm = (value: string, keyword: string) => {
+  const normalizedKeyword = normalizeSearchText(keyword)
+  return normalizeSearchText(value).some(variant =>
+    normalizedKeyword.some(term => variant.includes(term) || term.includes(variant))
+  )
+}
+
 const readSavedPlayers = (): Player[] => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -50,26 +79,33 @@ function PlayerList() {
   const [players, setPlayers] = useState<Player[]>(readSavedPlayers)
   const [search, setSearch] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingPlayerId, setEditingPlayerId] = useState<number | null>(null)
   const [form, setForm] = useState<NewPlayerForm>(EMPTY_FORM)
   const [error, setError] = useState('')
+
+  const editingPlayer = players.find(player => player.id === editingPlayerId) ?? null
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(players))
   }, [players])
 
   const filtered = players.filter(player => {
-    const keyword = search.trim().toLowerCase()
+    const keyword = search.trim()
     if (!keyword) return true
-    return (
-      player.name.toLowerCase().includes(keyword) ||
-      player.position.toLowerCase().includes(keyword)
-    )
+
+    const searchableValues = [
+      player.name,
+      player.position,
+      ...(POSITION_ALIASES[player.position] ?? [player.position]),
+    ]
+
+    return searchableValues.some(value => matchesSearchTerm(value, keyword))
   })
 
   const deletePlayer = (id: number) => {
-    if (confirm('本当に削除しますか？')) {
-      setPlayers(players.filter(player => player.id !== id))
-    }
+    setPlayers(prev => prev.filter(player => player.id !== id))
+    setEditingPlayerId(currentId => (currentId === id ? null : currentId))
+    setShowAddForm(false)
   }
 
   const handleAddChange = (
@@ -143,6 +179,13 @@ function PlayerList() {
     setShowAddForm(false)
   }
 
+  const handleSaveEditedPlayer = (updatedPlayer: Player) => {
+    setPlayers(prev =>
+      prev.map(player => (player.id === updatedPlayer.id ? updatedPlayer : player))
+    )
+    setEditingPlayerId(null)
+  }
+
   return (
     <div className="player-list">
       <div className="list-header">
@@ -152,7 +195,16 @@ function PlayerList() {
         </button>
       </div>
 
-      {showAddForm && (
+      {editingPlayer && (
+        <EditPlayerForm
+          player={editingPlayer}
+          allPlayers={players}
+          onSave={handleSaveEditedPlayer}
+          onCancel={() => setEditingPlayerId(null)}
+        />
+      )}
+
+      {showAddForm && !editingPlayer && (
         <div className="game-form player-form">
           <h2>選手追加</h2>
 
@@ -271,8 +323,21 @@ function PlayerList() {
                   <td className={isDuplicate ? 'duplicate-cell' : ''}><span className="badge-pos">{player.position}</span></td>
                   <td className={isDuplicate ? 'duplicate-cell' : ''}>{player.throwHand}投{player.batHand}打</td>
                   <td className={isDuplicate ? 'duplicate-cell' : ''}>
-                    <button type="button" className="btn-edit">編集</button>
-                    <button type="button" className="btn-delete" onClick={() => deletePlayer(player.id)}>削除</button>
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={() => {
+                        setShowAddForm(false)
+                        setEditingPlayerId(player.id)
+                      }}
+                    >
+                      編集
+                    </button>
+                    <DeletePlayerButton
+                      playerName={player.name}
+                      playerNumber={player.number}
+                      onDelete={() => deletePlayer(player.id)}
+                    />
                   </td>
                 </tr>
               )
