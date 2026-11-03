@@ -1,73 +1,38 @@
-# React + TypeScript + Vite
+# 野球スコアアプリ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+草野球の選手名簿と試合結果を管理する React + TypeScript アプリです。
 
-Currently, two official plugins are available:
+## 主な機能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 選手の追加・編集・削除、背番号の重複確認、選手検索
+- 試合情報の登録と一覧表示
+- ホーム／アウェーチーム名と7回または9回分の得点入力
+- イニング別スコアボード、合計得点、勝敗の表示
+- 選手・試合データの `localStorage` 保存
 
-## React Compiler
+## 起動方法
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Node.js と npm がインストールされた環境で、プロジェクトのルートから実行します。
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+ブラウザーで http://localhost:5173/ を開きます。Vite の開発サーバーは localhost で待ち受けます。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 確認コマンド
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+npm run lint
 ```
+
+## 構成と設計
+
+- `src/components/`: 画面表示とユーザー操作を担当
+- `src/domain/GameScore.ts`: イニング別得点の組み立て、合計点、勝敗判定を担当
+- `src/App.tsx`: 試合データの状態管理と `localStorage` 保存を担当
+- `docs/`: コンポーネントとドメインモデルの設計書
+
+得点計算の業務ルールを UI コンポーネントから分離することで、表示と計算それぞれの責務を明確にしています。設計書一覧は [docs/00-design-index.md](docs/00-design-index.md) を参照してください。

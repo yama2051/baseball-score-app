@@ -14,6 +14,7 @@
 6. [06-gameform-design.md](06-gameform-design.md) - GameForm
 7. [07-gameresultlist-design.md](07-gameresultlist-design.md) - GameResultList
 8. [08-header-design.md](08-header-design.md) - Header
+9. [09-game-score-design.md](09-game-score-design.md) - GameScore ドメインモデル
 
 ## 設計方針
 
@@ -21,6 +22,7 @@
 - UIの状態遷移は妥当なイベント駆動で管理する
 - 変更が発生した場合は設計書にも反映し、修正履歴を残す
 - 今回の運用では、最小修正で機能追加を連続して行える設計を採用している
+- 得点の集計・勝敗判定などの業務ルールは UI から分離したドメインモデルに置く
 
 ## 図解（Excel風構成）
 
@@ -37,9 +39,13 @@
 │ EditPlayerForm │ DeletePlayerButton │ FieldError │ Search    │
 ├──────────────────────────────────────────────────────────────┤
 │ 選手編集       │ 削除確認           │ エラー表示 │ 検索処理   │
+├──────────────────────────────────────────────────────────────┤
+│ GameForm → GameScore → GameResultList                      │
+│ 試合入力   得点・勝敗計算  スコアボード表示                 │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ## 修正履歴
 
 - 2026-10-25: 初版作成
+- 2026-11-01: GameScore ドメインモデルとイニング別スコア設計を追加

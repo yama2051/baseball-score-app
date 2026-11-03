@@ -1,3 +1,5 @@
+import { GameScore } from '../domain/GameScore'
+
 type GameResult = {
   id: number
   date: string
@@ -5,6 +7,8 @@ type GameResult = {
   awayTeam: string
   location: string
   innings: number
+  homeScores?: number[]
+  awayScores?: number[]
   weather: string
   memo: string
 }
@@ -45,11 +49,16 @@ function GameResultList({ games }: Props) {
         {games.map(game => (
           <article key={game.id} className="game-card">
             <div className="game-date">{formatDate(game.date)}</div>
-            <div className="game-score">
-              <span>{game.homeTeam}</span>
-              <strong>vs</strong>
-              <span>{game.awayTeam}</span>
-            </div>
+            {game.homeScores && game.awayScores && (
+              <Scoreboard game={game} />
+            )}
+            {(!game.homeScores || !game.awayScores) && (
+              <div className="game-score">
+                <span>{game.homeTeam}</span>
+                <strong>vs</strong>
+                <span>{game.awayTeam}</span>
+              </div>
+            )}
             <div className="game-meta">
               <span>場所: {game.location || '未入力'}</span>
               <span>イニング: {game.innings}</span>
@@ -60,6 +69,43 @@ function GameResultList({ games }: Props) {
         ))}
       </div>
     </section>
+  )
+}
+
+function Scoreboard({ game }: { game: GameResult }) {
+  if (!game.homeScores || !game.awayScores) return null
+
+  const score = new GameScore(game.homeScores, game.awayScores)
+
+  return (
+    <div className="score-table-wrapper">
+      <table className="score-result-table">
+        <thead>
+          <tr>
+            <th scope="col">チーム</th>
+            {score.innings.map(inning => (
+              <th scope="col" key={inning.inning}>{inning.inning}回</th>
+            ))}
+            <th scope="col">計</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{game.homeTeam}</th>
+            {score.innings.map(inning => <td key={inning.inning}>{inning.home}</td>)}
+            <td>{score.homeTotal}</td>
+          </tr>
+          <tr>
+            <th scope="row">{game.awayTeam}</th>
+            {score.innings.map(inning => <td key={inning.inning}>{inning.away}</td>)}
+            <td>{score.awayTotal}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p className="game-outcome">
+        {score.getResult(game.homeTeam, game.awayTeam)}
+      </p>
+    </div>
   )
 }
 

@@ -73,6 +73,8 @@ type RegisteredGame = {
   awayTeam: string
   location: string
   innings: number
+  homeScores?: number[]
+  awayScores?: number[]
   weather: string
   memo: string
 }
@@ -84,7 +86,9 @@ type RegisteredGame = {
 2. 保存データがなければ初期データを使用する
 3. `games` が変わるたびに `useEffect` で localStorage に保存する
 4. 試合登録が完了すると `handleSubmit` が新しいゲームを追加する
-5. 新しいデータは `GameResultList` に流れる
+5. ゲームにはホーム／アウェーの各イニング得点が含まれる
+6. 新しいデータは `GameResultList` に流れ、`GameScore` が合計点と勝敗を提供する
+7. 既存データには得点がない場合があるため、スコア未登録試合は従来の対戦カード表示を維持する
 
 ## 5. 画面遷移
 
@@ -120,7 +124,9 @@ stateDiagram-v2
 - App は「画面の制御」を担当し、データ処理の詳細は各コンポーネントに分離する
 - サブコンポーネントの責務が明確であるため、将来的な追加や修正が容易になる
 - localStorage と React state の同期を一元化し、状態の再現性を確保する
+- スコアの集計・勝敗判定は UI コンポーネントからドメインモデルへ分離する
 
 ## 修正履歴
 
 - 2026-10-25: 初版作成
+- 2026-11-01: イニング別得点の保存と結果一覧への受け渡しを追加

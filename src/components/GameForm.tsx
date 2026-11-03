@@ -6,6 +6,8 @@ type GameFormData = {
   awayTeam: string
   location: string
   innings: number
+  homeScores: number[]
+  awayScores: number[]
   weather: string
   memo: string
 }
@@ -22,6 +24,8 @@ function GameForm({ onSubmit, onCancel }: Props) {
     awayTeam: '',
     location: '',
     innings: 9,
+    homeScores: Array(9).fill(0),
+    awayScores: Array(9).fill(0),
     weather: '晴れ',
     memo: '',
   })
@@ -47,8 +51,39 @@ function GameForm({ onSubmit, onCancel }: Props) {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
+    if (name === 'innings') {
+      const innings = Number(value)
+      setForm(prev => ({
+        ...prev,
+        innings,
+        homeScores: Array.from({ length: innings }, (_, index) => prev.homeScores[index] ?? 0),
+        awayScores: Array.from({ length: innings }, (_, index) => prev.awayScores[index] ?? 0),
+      }))
+      return
+    }
     setForm(prev => ({ ...prev, [name]: value }))
   }
+
+  const handleScoreChange = (
+    team: 'homeScores' | 'awayScores',
+    inningIndex: number,
+    value: string
+  ) => {
+    const score = Number(value)
+    if (!Number.isInteger(score) || score < 0) return
+
+    setForm(prev => ({
+      ...prev,
+      [team]: prev[team].map((currentScore, index) =>
+        index === inningIndex ? score : currentScore
+      ),
+    }))
+  }
+
+  const scoreTeams = [
+    { key: 'homeScores', label: form.homeTeam || 'ホーム', scores: form.homeScores },
+    { key: 'awayScores', label: form.awayTeam || 'アウェイ', scores: form.awayScores },
+  ] as const
 
   return (
     <div className="game-form">
@@ -89,6 +124,9 @@ function GameForm({ onSubmit, onCancel }: Props) {
           {errors.awayTeam && <p className="error">{errors.awayTeam}</p>}
         </div>
       </div>
+      <p className="score-team-name-hint">
+        チーム名は下のスコアボードにも反映されます。
+      </p>
 
       <div className="form-group">
         <label>場所</label>
@@ -116,6 +154,45 @@ function GameForm({ onSubmit, onCancel }: Props) {
             <option>曇り</option>
             <option>雨</option>
           </select>
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label>イニング別スコア</label>
+        <div className="score-table-wrapper">
+          <table className="score-input-table">
+            <thead>
+              <tr>
+                <th scope="col">チーム</th>
+                {Array.from({ length: form.innings }, (_, index) => (
+                  <th scope="col" key={index}>{index + 1}回</th>
+                ))}
+                <th scope="col">合計</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scoreTeams.map(team => (
+                <tr key={team.key}>
+                  <th scope="row">{team.label}</th>
+                  {team.scores.map((score, index) => (
+                    <td key={index}>
+                      <input
+                        aria-label={`${team.label} ${index + 1}回の得点`}
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={score}
+                        onChange={event => handleScoreChange(team.key, index, event.target.value)}
+                      />
+                    </td>
+                  ))}
+                  <td className="score-input-total">
+                    {team.scores.reduce((total, inningScore) => total + inningScore, 0)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
