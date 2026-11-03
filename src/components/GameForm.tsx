@@ -1,4 +1,8 @@
 import { useState } from 'react'
+import { GameLineup, type LineupEntry, type TeamSide } from '../domain/GameLineup'
+import type { Player } from '../domain/Player'
+import GameLineupEditor from './GameLineupEditor'
+import FieldError from './FieldError'
 
 type GameFormData = {
   date: string
@@ -10,14 +14,19 @@ type GameFormData = {
   awayScores: number[]
   weather: string
   memo: string
+  lineup?: {
+    teamSide: TeamSide
+    entries: LineupEntry[]
+  }
 }
 
 type Props = {
+  players: Player[]
   onSubmit: (data: GameFormData) => void
   onCancel: () => void
 }
 
-function GameForm({ onSubmit, onCancel }: Props) {
+function GameForm({ players, onSubmit, onCancel }: Props) {
   const [form, setForm] = useState<GameFormData>({
     date: '',
     homeTeam: '',
@@ -31,6 +40,9 @@ function GameForm({ onSubmit, onCancel }: Props) {
   })
 
   const [errors, setErrors] = useState<Partial<GameFormData>>({})
+  const [lineupEntries, setLineupEntries] = useState<LineupEntry[]>([])
+  const [teamSide, setTeamSide] = useState<TeamSide>('home')
+  const [lineupError, setLineupError] = useState('')
 
   const validate = () => {
     const newErrors: Partial<GameFormData> = {}
@@ -42,9 +54,18 @@ function GameForm({ onSubmit, onCancel }: Props) {
   }
 
   const handleSubmit = () => {
-    if (validate()) {
-      onSubmit(form)
+    if (!validate()) return
+
+    const validationError = new GameLineup(0, teamSide, lineupEntries).validate()
+    if (validationError) {
+      setLineupError(validationError)
+      return
     }
+
+    onSubmit({
+      ...form,
+      lineup: { teamSide, entries: lineupEntries },
+    })
   }
 
   const handleChange = (
@@ -207,9 +228,30 @@ function GameForm({ onSubmit, onCancel }: Props) {
         />
       </div>
 
+      <section className="game-lineup-form">
+        <h3>出場選手・打順</h3>
+        <p className="stats-note">
+          試合登録にはスタメン9人の登録が必要です。控え選手は任意で追加できます。
+        </p>
+        <GameLineupEditor
+          gameId={0}
+          teamSide={teamSide}
+          entries={lineupEntries}
+          players={players}
+          homeTeam={form.homeTeam || 'ホーム'}
+          awayTeam={form.awayTeam || 'アウェー'}
+          onTeamSideChange={setTeamSide}
+          onEntriesChange={entries => {
+            setLineupEntries(entries)
+            setLineupError('')
+          }}
+        />
+        <FieldError message={lineupError} />
+      </section>
+
       <div className="form-actions">
-        <button className="btn-cancel" onClick={onCancel}>キャンセル</button>
-        <button className="btn-submit" onClick={handleSubmit}>登録する</button>
+        <button type="button" className="btn-cancel" onClick={onCancel}>キャンセル</button>
+        <button type="button" className="btn-submit" onClick={handleSubmit}>試合を登録</button>
       </div>
     </div>
   )

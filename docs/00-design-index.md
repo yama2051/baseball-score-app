@@ -15,6 +15,8 @@
 7. [07-gameresultlist-design.md](07-gameresultlist-design.md) - GameResultList
 8. [08-header-design.md](08-header-design.md) - Header
 9. [09-game-score-design.md](09-game-score-design.md) - GameScore ドメインモデル
+10. [10-player-stats-design.md](10-player-stats-design.md) - 選手別成績入力・計算
+11. [11-game-lineup-design.md](11-game-lineup-design.md) - 試合別ラインアップ
 
 ## 設計方針
 
@@ -42,6 +44,12 @@
 ├──────────────────────────────────────────────────────────────┤
 │ GameForm → GameScore → GameResultList                      │
 │ 試合入力   得点・勝敗計算  スコアボード表示                 │
+├──────────────────────────────────────────────────────────────┤
+│ PlayerStatsManager → PlayerSeasonStats → PlayerStatsCalculator │
+│ 試合成績入力       集計・率計算             通算成績表示      │
+├──────────────────────────────────────────────────────────────┤
+│ GameForm → GameLineupEditor → GameLineup                   │
+│ 試合登録時入力        入力UI             打順・守備ルール      │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -49,3 +57,5 @@
 
 - 2026-10-25: 初版作成
 - 2026-11-01: GameScore ドメインモデルとイニング別スコア設計を追加
+- 2026-11-03: 試合ごとの選手成績入力と通算計算の設計を追加
+- 2026-11-03: 試合別ラインアップのオブジェクト設計を追加

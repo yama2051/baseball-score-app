@@ -72,6 +72,199 @@ textarea {
   text-align: center;
 }
 
+.player-stats {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+
+.player-stats > h2,
+.player-stats-summary h3 {
+  text-align: center;
+}
+
+.player-stat-entry-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.player-stat-entry {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.player-stat-entry summary {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.stats-input-section {
+  padding: 0 16px 16px;
+}
+
+.stats-input-section h3 {
+  margin: 14px 0 8px;
+  font-size: 15px;
+}
+
+.stats-input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.stats-input-grid label {
+  display: grid;
+  gap: 4px;
+  color: #555;
+  font-size: 12px;
+}
+
+.stats-input-grid input {
+  width: 100%;
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid #d6dbe4;
+  border-radius: 6px;
+}
+
+.stats-note {
+  margin: 8px 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+.stats-message {
+  margin: 10px 0;
+}
+
+.stats-success {
+  margin: 10px 0;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.player-stats-summary {
+  margin-top: 32px;
+}
+
+.player-stats-summary h3 {
+  margin: 20px 0 8px;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  background: #fff;
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 8px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.stats-table th {
+  background: #eef4ff;
+  color: #243b5c;
+}
+
+.game-lineup {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+
+.game-lineup-form {
+  margin-top: 24px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+}
+
+.game-lineup-form > h3 {
+  margin: 0 0 10px;
+  text-align: left;
+}
+
+.game-lineup > h2,
+.lineup-preview h3 {
+  text-align: center;
+}
+
+.lineup-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  background: #fff;
+}
+
+.lineup-table th,
+.lineup-table td {
+  padding: 8px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.lineup-table th {
+  background: #eef4ff;
+  color: #243b5c;
+}
+
+.lineup-table select {
+  min-width: 90px;
+  padding: 6px;
+  border: 1px solid #d6dbe4;
+  border-radius: 6px;
+}
+
+.lineup-preview {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.lineup-preview h4 {
+  margin: 14px 0 6px;
+}
+
+.lineup-preview ol {
+  margin: 0;
+  padding-left: 28px;
+}
+
+.game-lineup-summary {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.game-lineup-summary summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.game-lineup-summary h3 {
+  margin: 12px 0 4px;
+  font-size: 14px;
+}
+
+.game-lineup-summary ol {
+  margin: 0;
+  padding-left: 24px;
+}
+
 .game-results {
   max-width: 900px;
   margin: 0 auto;

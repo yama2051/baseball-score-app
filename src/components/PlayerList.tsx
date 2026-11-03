@@ -1,16 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import DeletePlayerButton from './DeletePlayerButton'
 import EditPlayerForm from './EditPlayerForm'
 import FieldError from './FieldError'
-
-type Player = {
-  id: number
-  name: string
-  number: number
-  position: string
-  batHand: string
-  throwHand: string
-}
+import GameLineupManager from './GameLineupManager'
+import PlayerStatsManager from './PlayerStatsManager'
+import type { GameLineupData, GameResult } from './GameResultList'
+import type { Player } from '../domain/Player'
 
 type NewPlayerForm = {
   name: string
@@ -20,12 +15,6 @@ type NewPlayerForm = {
   throwHand: string
 }
 
-const INITIAL_PLAYERS: Player[] = [
-  { id: 1, name: '山田 太郎', number: 7,  position: 'SS', batHand: '右', throwHand: '右' },
-  { id: 2, name: '佐藤 次郎', number: 3,  position: '1B', batHand: '左', throwHand: '左' },
-  { id: 3, name: '田中 花子', number: 21, position: 'CF', batHand: '左', throwHand: '右' },
-]
-
 const EMPTY_FORM: NewPlayerForm = {
   name: '',
   number: '',
@@ -33,8 +22,6 @@ const EMPTY_FORM: NewPlayerForm = {
   batHand: '右',
   throwHand: '右',
 }
-
-const STORAGE_KEY = 'baseball-score-app-players'
 
 const POSITION_ALIASES: Record<string, string[]> = {
   SS: ['SS', 'shortstop', 'ショート', 'ショートストップ', '遊撃', '遊撃手'],
@@ -63,20 +50,17 @@ const matchesSearchTerm = (value: string, keyword: string) => {
   )
 }
 
-const readSavedPlayers = (): Player[] => {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (!saved) return INITIAL_PLAYERS
-
-    const parsed = JSON.parse(saved) as Player[]
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_PLAYERS
-  } catch {
-    return INITIAL_PLAYERS
-  }
-}
-
-function PlayerList() {
-  const [players, setPlayers] = useState<Player[]>(readSavedPlayers)
+function PlayerList({
+  games,
+  players,
+  onPlayersChange,
+  onSaveLineup,
+}: {
+  games: GameResult[]
+  players: Player[]
+  onPlayersChange: (update: (current: Player[]) => Player[]) => void
+  onSaveLineup: (gameId: number, lineup: GameLineupData) => void
+}) {
   const [search, setSearch] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingPlayerId, setEditingPlayerId] = useState<number | null>(null)
@@ -84,10 +68,6 @@ function PlayerList() {
   const [error, setError] = useState('')
 
   const editingPlayer = players.find(player => player.id === editingPlayerId) ?? null
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(players))
-  }, [players])
 
   const filtered = players.filter(player => {
     const keyword = search.trim()
@@ -103,7 +83,7 @@ function PlayerList() {
   })
 
   const deletePlayer = (id: number) => {
-    setPlayers(prev => prev.filter(player => player.id !== id))
+    onPlayersChange(prev => prev.filter(player => player.id !== id))
     setEditingPlayerId(currentId => (currentId === id ? null : currentId))
     setShowAddForm(false)
   }
@@ -173,14 +153,14 @@ function PlayerList() {
       throwHand: form.throwHand,
     }
 
-    setPlayers(prev => [newPlayer, ...prev])
+    onPlayersChange(prev => [newPlayer, ...prev])
     setForm(EMPTY_FORM)
     setError('')
     setShowAddForm(false)
   }
 
   const handleSaveEditedPlayer = (updatedPlayer: Player) => {
-    setPlayers(prev =>
+    onPlayersChange(prev =>
       prev.map(player => (player.id === updatedPlayer.id ? updatedPlayer : player))
     )
     setEditingPlayerId(null)
@@ -345,6 +325,8 @@ function PlayerList() {
           )}
         </tbody>
       </table>
+      <PlayerStatsManager players={players} games={games} />
+      <GameLineupManager players={players} games={games} onSaveLineup={onSaveLineup} />
     </div>
   )
 }

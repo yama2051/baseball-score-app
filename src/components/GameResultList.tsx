@@ -1,6 +1,13 @@
 import { GameScore } from '../domain/GameScore'
+import { GameLineup, type LineupEntry, type TeamSide } from '../domain/GameLineup'
+import type { Player } from '../domain/Player'
 
-type GameResult = {
+export type GameLineupData = {
+  teamSide: TeamSide
+  entries: LineupEntry[]
+}
+
+export type GameResult = {
   id: number
   date: string
   homeTeam: string
@@ -9,12 +16,14 @@ type GameResult = {
   innings: number
   homeScores?: number[]
   awayScores?: number[]
+  lineup?: GameLineupData
   weather: string
   memo: string
 }
 
 type Props = {
   games: GameResult[]
+  players: Player[]
 }
 
 const formatDate = (date: string) => {
@@ -32,7 +41,7 @@ const formatDate = (date: string) => {
   }).format(parsed)
 }
 
-function GameResultList({ games }: Props) {
+function GameResultList({ games, players }: Props) {
   if (games.length === 0) {
     return (
       <section className="game-results">
@@ -65,10 +74,42 @@ function GameResultList({ games }: Props) {
               <span>天気: {game.weather}</span>
             </div>
             {game.memo && <p className="game-memo">メモ: {game.memo}</p>}
+            {game.lineup && <GameLineupSummary game={game} players={players} />}
           </article>
         ))}
       </div>
     </section>
+  )
+}
+
+function GameLineupSummary({ game, players }: { game: GameResult; players: Player[] }) {
+  if (!game.lineup) return null
+
+  const lineup = new GameLineup(game.id, game.lineup.teamSide, game.lineup.entries)
+  const teamName = game.lineup.teamSide === 'home' ? game.homeTeam : game.awayTeam
+
+  return (
+    <details className="game-lineup-summary">
+      <summary>ラインアップ：{teamName}</summary>
+      <h3>スタメン</h3>
+      {lineup.starters.length === 0 ? (
+        <p>スタメン未登録</p>
+      ) : (
+        <ol>
+          {lineup.starters.map(entry => (
+            <li key={entry.playerId}>
+              {entry.battingOrder}番 {entry.position} {players.find(player => player.id === entry.playerId)?.name ?? '退団選手'}
+            </li>
+          ))}
+        </ol>
+      )}
+      <h3>控え</h3>
+      <p>
+        {lineup.reserves
+          .map(entry => `${entry.position} ${players.find(player => player.id === entry.playerId)?.name ?? '退団選手'}`)
+          .join('、') || '控えなし'}
+      </p>
+    </details>
   )
 }
 
@@ -109,5 +150,4 @@ function Scoreboard({ game }: { game: GameResult }) {
   )
 }
 
-export type { GameResult }
 export default GameResultList
