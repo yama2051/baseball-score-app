@@ -6,6 +6,7 @@ import {
 } from '../domain/PlayerGameStats'
 import type { GameResult } from './GameResultList'
 import PlayerStatsCalculator from './PlayerStatsCalculator'
+import PlayerStatsTrend from './PlayerStatsTrend'
 
 type Player = {
   id: number
@@ -118,7 +119,7 @@ function PlayerStatsManager({ players, games }: Props) {
   }
 
   return (
-    <section className="player-stats">
+    <section className="player-stats" id="player-stats">
       <h2>選手成績</h2>
       {games.length === 0 ? (
         <p className="empty-state">先に試合を登録してください。</p>
@@ -201,6 +202,7 @@ function PlayerStatsManager({ players, games }: Props) {
         </>
       )}
       <PlayerStatsCalculator players={players} records={records} />
+      <PlayerStatsTrend players={players} games={games} records={records} />
     </section>
   )
 }

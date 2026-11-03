@@ -58,6 +58,47 @@ export const validatePlayerGameStats = (stats: PlayerGameStats): string | null =
   return null
 }
 
+type StatTotals = Omit<PlayerGameStats, 'gameId' | 'playerId'>
+
+export class PlayerGameStatsCalculator {
+  private readonly stats: StatTotals
+
+  constructor(stats: StatTotals) {
+    this.stats = stats
+  }
+
+  get battingAverage(): number | null {
+    return this.stats.atBats === 0 ? null : this.stats.hits / this.stats.atBats
+  }
+
+  get onBasePercentage(): number | null {
+    const plateAppearances =
+      this.stats.atBats + this.stats.walks + this.stats.hitByPitch + this.stats.sacrificeFlies
+    return plateAppearances === 0
+      ? null
+      : (this.stats.hits + this.stats.walks + this.stats.hitByPitch) / plateAppearances
+  }
+
+  get sluggingPercentage(): number | null {
+    if (this.stats.atBats === 0) return null
+    const totalBases =
+      this.stats.hits + this.stats.doubles + this.stats.triples * 2 + this.stats.homeRuns * 3
+    return totalBases / this.stats.atBats
+  }
+
+  get earnedRunAverage(): number | null {
+    return this.stats.pitchingOuts === 0
+      ? null
+      : (this.stats.earnedRuns * 27) / this.stats.pitchingOuts
+  }
+
+  get walksAndHitsPerInningPitched(): number | null {
+    return this.stats.pitchingOuts === 0
+      ? null
+      : ((this.stats.hitsAllowed + this.stats.pitchingWalks) * 3) / this.stats.pitchingOuts
+  }
+}
+
 const sum = (records: PlayerGameStats[], field: keyof PlayerGameStats) =>
   records.reduce((total, record) => total + Number(record[field]), 0)
 
@@ -102,29 +143,22 @@ export class PlayerSeasonStats {
   }
 
   get battingAverage(): number | null {
-    return this.atBats === 0 ? null : this.hits / this.atBats
+    return new PlayerGameStatsCalculator(this).battingAverage
   }
 
   get onBasePercentage(): number | null {
-    const plateAppearances = this.atBats + this.walks + this.hitByPitch + this.sacrificeFlies
-    return plateAppearances === 0
-      ? null
-      : (this.hits + this.walks + this.hitByPitch) / plateAppearances
+    return new PlayerGameStatsCalculator(this).onBasePercentage
   }
 
   get sluggingPercentage(): number | null {
-    if (this.atBats === 0) return null
-    const totalBases = this.hits + this.doubles + this.triples * 2 + this.homeRuns * 3
-    return totalBases / this.atBats
+    return new PlayerGameStatsCalculator(this).sluggingPercentage
   }
 
   get earnedRunAverage(): number | null {
-    return this.pitchingOuts === 0 ? null : (this.earnedRuns * 27) / this.pitchingOuts
+    return new PlayerGameStatsCalculator(this).earnedRunAverage
   }
 
   get walksAndHitsPerInningPitched(): number | null {
-    return this.pitchingOuts === 0
-      ? null
-      : ((this.hitsAllowed + this.pitchingWalks) * 3) / this.pitchingOuts
+    return new PlayerGameStatsCalculator(this).walksAndHitsPerInningPitched
   }
 }

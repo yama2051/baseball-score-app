@@ -44,7 +44,7 @@ const formatDate = (date: string) => {
 function GameResultList({ games, players }: Props) {
   if (games.length === 0) {
     return (
-      <section className="game-results">
+      <section className="game-results" id="game-results">
         <h2>試合結果</h2>
         <div className="empty-state">まだ試合結果がありません。</div>
       </section>
@@ -52,7 +52,7 @@ function GameResultList({ games, players }: Props) {
   }
 
   return (
-    <section className="game-results">
+    <section className="game-results" id="game-results">
       <h2>試合結果</h2>
       <div className="game-results-grid">
         {games.map(game => (

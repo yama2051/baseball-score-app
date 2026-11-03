@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Header from './components/Header'
+import SectionNavigation from './components/SectionNavigation'
 import PlayerList from './components/PlayerList'
 import GameForm from './components/GameForm'
 import GameResultList, { type GameLineupData, type GameResult } from './components/GameResultList'
@@ -126,20 +127,23 @@ function App() {
   return (
     <div className="app-shell">
       <Header />
-      <button
-        className="action-button"
-        style={{ margin: '16px 24px' }}
-        onClick={() => setShowForm(true)}
-      >
-        ＋ 試合を登録
-      </button>
-      {showForm && (
-        <GameForm
-          players={players}
-          onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
-        />
-      )}
+      <SectionNavigation />
+      <section id="game-registration" className="game-registration">
+        <button
+          className="action-button"
+          style={{ margin: '16px 24px' }}
+          onClick={() => setShowForm(true)}
+        >
+          ＋ 試合を登録
+        </button>
+        {showForm && (
+          <GameForm
+            players={players}
+            onSubmit={handleSubmit}
+            onCancel={() => setShowForm(false)}
+          />
+        )}
+      </section>
       <GameResultList games={games} players={players} />
       <PlayerList
         games={games}

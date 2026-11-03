@@ -65,6 +65,46 @@ textarea {
   padding-bottom: 40px;
 }
 
+.section-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 24px;
+  border-block: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+  scrollbar-width: thin;
+}
+
+.section-navigation a {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border: 1px solid #d6dbe4;
+  border-radius: 999px;
+  background: #fff;
+  color: #234b8a;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.section-navigation a:hover,
+.section-navigation a:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.game-registration,
+#game-results,
+#players,
+#player-stats,
+#game-lineups {
+  scroll-margin-top: 76px;
+}
+
 .player-list {
   max-width: 900px;
   margin: 24px auto 0;
@@ -151,6 +191,101 @@ textarea {
 
 .player-stats-summary {
   margin-top: 32px;
+}
+
+.player-stats-trend {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.player-stats-trend > h3 {
+  margin: 0 0 14px;
+  text-align: center;
+}
+
+.trend-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.trend-controls label {
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+  color: #555;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.trend-controls select {
+  padding: 8px 10px;
+  border: 1px solid #d6dbe4;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.trend-empty {
+  margin-top: 10px;
+}
+
+.trend-chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.trend-chart {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+  height: auto;
+}
+
+.trend-axis-title {
+  fill: #243b5c;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.trend-grid-line {
+  stroke: #e6ebf2;
+  stroke-width: 1;
+}
+
+.trend-axis-line {
+  stroke: #8795a8;
+  stroke-width: 1.2;
+}
+
+.trend-axis-label,
+.trend-date-label {
+  fill: #667085;
+  font-size: 11px;
+}
+
+.trend-line {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trend-point {
+  fill: #fff;
+  stroke: #1d4ed8;
+  stroke-width: 3;
+}
+
+.trend-value-label {
+  fill: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .player-stats-summary h3 {

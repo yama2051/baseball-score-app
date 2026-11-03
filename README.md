@@ -9,6 +9,8 @@
 - ホーム／アウェーチーム名と7回または9回分の得点入力
 - イニング別スコアボード、合計得点、勝敗の表示
 - 試合登録時の出場選手、スタメン打順、守備位置、控えの確定
+- 試合ごとの打率・出塁率・長打率・防御率・WHIPの推移グラフ
+- 画面上部のセクション移動ナビゲーション
 - 選手・試合データの `localStorage` 保存
 - 試合ごとの選手別打撃・投手成績入力と通算成績の自動集計
 
@@ -38,6 +40,8 @@ npm run lint
 - `src/domain/GameLineup.ts`: 試合ごとの出場選手、打順、守備位置のルールを担当
 - `src/components/PlayerStatsManager.tsx`: 試合選択、成績入力、保存を担当
 - `src/components/PlayerStatsCalculator.tsx`: 選手ごとの通算成績を表示
+- `src/components/PlayerStatsTrend.tsx`: 試合ごとの選手成績推移をグラフ表示
+- `src/components/SectionNavigation.tsx`: 画面各セクションへのページ内リンク
 - `src/components/GameLineupManager.tsx`: 試合ごとのラインアップ入力・保存・確認を担当
 - `src/App.tsx`: 試合データの状態管理と `localStorage` 保存を担当
 - `docs/`: コンポーネントとドメインモデルの設計書

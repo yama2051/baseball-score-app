@@ -167,7 +167,7 @@ function PlayerList({
   }
 
   return (
-    <div className="player-list">
+    <div className="player-list" id="players">
       <div className="list-header">
         <h2>選手一覧</h2>
         <button type="button" className="action-button" onClick={() => setShowAddForm(true)}>

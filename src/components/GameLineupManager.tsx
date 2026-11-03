@@ -19,7 +19,18 @@ function GameLineupManager({ players, games, onSaveLineup }: Props) {
   const selectedGame = gamesWithoutLineup.find(game => game.id === selectedGameId)
     ?? gamesWithoutLineup[0]
 
-  if (!selectedGame) return null
+  if (!selectedGame) {
+    return (
+      <section id="game-lineups" className="game-lineup">
+        <h2>ラインアップ</h2>
+        <p className="empty-state">
+          {games.length === 0
+            ? '試合を登録するとラインアップを設定できます。'
+            : 'すべての試合でラインアップが登録済みです。試合結果から確認できます。'}
+        </p>
+      </section>
+    )
+  }
 
   return (
     <LegacyLineupSetup
@@ -62,7 +73,7 @@ function LegacyLineupSetup({
   }
 
   return (
-    <section className="game-lineup legacy-lineup-setup">
+    <section id="game-lineups" className="game-lineup legacy-lineup-setup">
       <h2>過去の試合にラインアップを登録</h2>
       <p className="stats-note">
         試合登録時にラインアップを設定していない試合は、ここから一度だけ登録できます。登録後は表示のみになります。
